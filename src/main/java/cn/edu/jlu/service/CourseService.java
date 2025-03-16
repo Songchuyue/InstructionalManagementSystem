@@ -1,4 +1,8 @@
 package cn.edu.jlu.service;
 
-public class CourseService {
+import cn.edu.jlu.entity.Course;
+import java.util.List;
+
+public interface CourseService {
+	List<Course> findByTeacherId(String teacherId);
 }

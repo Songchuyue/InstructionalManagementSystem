@@ -4,6 +4,47 @@
     <meta charset="UTF-8">
     <title>教师主页</title>
     <link href="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function findCourses() {
+            fetch('/api/courses')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    const container = document.getElementById('coursesContainer');
+                    container.innerHTML = data.length > 0
+                        ? createCoursesHTML(data)
+                        : '<div class="alert alert-info mt-3">暂无授课课程</div>';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('coursesContainer').innerHTML =
+                        '<div class="alert alert-danger mt-3">课程加载失败</div>';
+                });
+        }
+
+        function createCoursesHTML(courses) {
+            return `
+                <div class="mt-4">
+                    <h4>授课课程</h4>
+                    ${courses.map(course => `
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h5 class="card-title">${course.courseName}</h5>
+                                <p class="card-text">
+                                    <strong>课程ID：</strong>${course.courseId}<br>
+                                    <strong>学分：</strong>${course.credit}<br>
+                                    <strong>学期：</strong>${course.semester}<br>
+                                    <strong>教室：</strong>${course.classroom}
+                                </p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    </script>
 </head>
 <body>
 <div class="container mt-5">
@@ -77,6 +118,14 @@
             </form>
         </div>
     </div>
+
+    <!-- 新增课程查询按钮 -->
+    <div class="mt-4">
+        <button class="btn btn-success" onclick="findCourses()">查看授课课程</button>
+    </div>
+
+    <!-- 课程展示容器 -->
+    <div id="coursesContainer" class="mt-3"></div>
 </div>
 <script src="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

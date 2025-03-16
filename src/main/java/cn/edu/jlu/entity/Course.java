@@ -1,8 +1,9 @@
 package cn.edu.jlu.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,11 @@ public class Course {
 	@Column(name = "course_name", nullable = false, length = 100)
 	private String courseName;
 
-	@Column
+	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "teacher_id", nullable = false)
+	private Teacher teacher;
+
 	private Integer credit;
 
 	@Column(length = 20)
@@ -26,12 +31,15 @@ public class Course {
 	@Column(length = 100)
 	private String classroom;
 
-	// 关联教师（多对一）
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "teacher_id", nullable = false)
-	private Teacher teacher;
-
-	// 关联选课记录（一对多）
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(
+			mappedBy = "course",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true
+	)
 	private List<StudentCourse> studentCourses = new ArrayList<>();
+
+	@JsonProperty("teacherId")  // 直接暴露教师ID到JSON
+	public String getTeacherId() {
+		return teacher != null ? teacher.getTeacherId() : null;
+	}
 }

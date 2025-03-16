@@ -2,25 +2,32 @@ package cn.edu.jlu.controller;
 
 import cn.edu.jlu.dto.TeacherDTO;
 import cn.edu.jlu.dto.TeacherUpdateForm;
+import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.entity.Teacher;
+import cn.edu.jlu.service.CourseService;
 import cn.edu.jlu.service.TeacherService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 @Controller
 @RequestMapping("/teacher")
 public class TeacherController {
 	private final TeacherService teacherService;
 
-	public TeacherController(TeacherService teacherService) {
+	private final CourseService courseService;
+
+	public TeacherController(
+			TeacherService teacherService,
+			CourseService courseService) { // 添加这个参数
 		this.teacherService = teacherService;
+		this.courseService = courseService; // 注入courseService
 	}
 
 	// 显示登录页面
@@ -108,5 +115,13 @@ public class TeacherController {
 		session.setAttribute("teacher", updatedTeacher);
 		model.addAttribute("updateSuccess", "信息已成功更新！");
 		return "redirect:/teacher/dashboard";
+	}
+
+	@GetMapping("/courses")
+	@ResponseBody
+	public List<Course> getTeachingCourses(HttpSession session) {
+		Teacher teacher = (Teacher) session.getAttribute("teacher");
+		if (teacher == null) return Collections.emptyList();
+		return courseService.findByTeacherId(teacher.getTeacherId());
 	}
 }
