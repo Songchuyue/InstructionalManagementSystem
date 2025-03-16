@@ -1,21 +1,20 @@
-<!-- templates/student/login.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>学生登录</title>
+    <title>教师登录</title>
     <link href="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-5" style="max-width: 400px;">
-    <h2 class="mb-4">学生登录</h2>
-    <form th:action="@{/student/login}" method="post" th:object="${studentDTO}">
-        <!-- 学号输入 -->
+    <h2 class="mb-4">教师登录</h2>
+    <form th:action="@{/teacher/login}" method="post" th:object="${teacherDTO}">
+        <!-- 工号输入 -->
         <div class="mb-3">
-            <label class="form-label">学号</label>
-            <input type="text" class="form-control" th:field="*{studentId}">
-            <small class="text-danger" th:if="${#fields.hasErrors('studentId')}"
-                   th:errors="*{studentId}"></small>
+            <label class="form-label">工号</label>
+            <input type="text" class="form-control" th:field="*{teacherId}">
+            <small class="text-danger" th:if="${#fields.hasErrors('teacherId')}"
+                   th:errors="*{teacherId}"></small>
         </div>
 
         <!-- 密码输入 -->

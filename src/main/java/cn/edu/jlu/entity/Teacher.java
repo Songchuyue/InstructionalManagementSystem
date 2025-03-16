@@ -1,9 +1,11 @@
 package cn.edu.jlu.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "teachers")
@@ -19,7 +21,22 @@ public class Teacher {
 	@Column(nullable = false, length = 100)
 	private String password;
 
-	// 关联教授的课程（一对多）
-	@OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Course> courses = new ArrayList<>();
+	@Column(length = 10)
+	private String gender;
+
+	@Min(value = 18, message = "教师年龄不能小于18岁")
+	@Max(value = 100, message = "教师年龄不能超过100岁")
+	private Integer age;
+
+	@Email(message = "邮箱格式不正确")
+	@Column(length = 100)
+	private String email;
+
+	@CreatedDate
+	@Column(name = "create_time", updatable = false)
+	private LocalDateTime createTime;
+
+	@LastModifiedDate
+	@Column(name = "update_time")
+	private LocalDateTime updateTime;
 }
