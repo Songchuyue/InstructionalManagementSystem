@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/teachingmanagement?useSSL=false
+    username: root
+    password: Wogua123456789
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect  # 使用 MySQL8 方言
+    hibernate:
+      ddl-auto: update  # 自动根据实体类更新表结构
+    show-sql: true     # 显示SQL日志
+
+# Thymeleaf 配置
+thymeleaf:
+  cache: false         # 开发时关闭缓存
