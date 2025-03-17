@@ -1,10 +1,10 @@
 package cn.edu.jlu.controller;
 
-import cn.edu.jlu.dto.TeacherDTO;
-import cn.edu.jlu.dto.TeacherUpdateForm;
+import cn.edu.jlu.dto.*;
 import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.entity.Teacher;
 import cn.edu.jlu.service.CourseService;
+import cn.edu.jlu.service.StudentCourseService;
 import cn.edu.jlu.service.TeacherService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,14 +21,16 @@ import java.util.List;
 @RequestMapping("/teacher")
 public class TeacherController {
 	private final TeacherService teacherService;
-
 	private final CourseService courseService;
+	private final StudentCourseService studentCourseService;
 
 	public TeacherController(
 			TeacherService teacherService,
-			CourseService courseService) { // 添加这个参数
+			CourseService courseService,
+			StudentCourseService studentCourseService) { // 新增参数
 		this.teacherService = teacherService;
-		this.courseService = courseService; // 注入courseService
+		this.courseService = courseService;
+		this.studentCourseService = studentCourseService; // 新增注入
 	}
 
 	// 显示登录页面
@@ -123,5 +126,56 @@ public class TeacherController {
 		Teacher teacher = (Teacher) session.getAttribute("teacher");
 		if (teacher == null) return Collections.emptyList();
 		return courseService.findByTeacherId(teacher.getTeacherId());
+	}
+
+	@GetMapping("/teaching-courses")
+	public String showTeachingCourses(HttpSession session, Model model) {
+		Teacher teacher = (Teacher) session.getAttribute("teacher");
+		if (teacher == null) return "redirect:/teacher/login";
+
+		// 获取课程列表并统计选课人数
+		List<CourseWithEnrollment> courses = courseService.findCoursesWithEnrollment(teacher.getTeacherId());
+		model.addAttribute("courses", courses);
+
+		return "teacher/courses";
+	}
+
+	@GetMapping("/grade-management")
+	public String showGradeManagement(
+			@RequestParam String courseId,
+			HttpSession session,
+			Model model
+	) {
+		Teacher teacher = (Teacher) session.getAttribute("teacher");
+		if (teacher == null) return "redirect:/teacher/login";
+
+		// 验证教师是否教授该课程
+		Course course = courseService.validateTeacherCourse(teacher.getTeacherId(), courseId);
+		if (course == null) return "redirect:/teacher/teaching-courses";
+
+		// 获取选课学生列表
+		List<GradeManagementDTO> students = studentCourseService.getStudentsWithGrades(courseId);
+		model.addAttribute("students", students);
+		model.addAttribute("course", course);
+
+		return "teacher/grade-management";
+	}
+
+	@PostMapping("/update-grades")
+	public String updateGrades(
+			@ModelAttribute GradeUpdateForm form,
+			HttpSession session,
+			RedirectAttributes redirectAttributes
+	) {
+		Teacher teacher = (Teacher) session.getAttribute("teacher");
+		if (teacher == null) return "redirect:/teacher/login";
+
+		try {
+			studentCourseService.batchUpdateGrades(form);
+			redirectAttributes.addFlashAttribute("success", "成绩更新成功");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("error", "更新失败: " + e.getMessage());
+		}
+		return "redirect:/teacher/grade-management?courseId=" + form.getCourseId();
 	}
 }

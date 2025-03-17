@@ -4,6 +4,7 @@ import cn.edu.jlu.dto.StudentDTO;
 import cn.edu.jlu.dto.StudentUpdateForm;
 import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.entity.Student;
+import cn.edu.jlu.entity.StudentCourse;
 import cn.edu.jlu.repository.StudentCourseRepository;
 import cn.edu.jlu.service.CourseService;
 import cn.edu.jlu.service.StudentService;
@@ -15,7 +16,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -130,18 +134,31 @@ public class StudentController {
 		if (student == null) return "redirect:/student/login";
 
 		// 获取符合年级的课程
-		String semester = student.getSemester();
 		List<Course> courses = courseService.findBySemester(student.getSemester());
 
-		// 获取已选课程ID列表
-		List<String> enrolledCourseIds = studentCourseRepository
-				.findByStudent_StudentId(student.getStudentId())
-				.stream()
+		// 获取已选课程及成绩（包含课程信息的预加载）
+		List<StudentCourse> enrolledCourses = studentCourseRepository.findByStudentWithCourses(student.getStudentId());
+
+		// 创建课程ID到成绩的快速查找Map
+		Map<String, BigDecimal> gradeMap = enrolledCourses.stream()
+				.filter(sc -> sc.getCourse() != null)
+				.filter(sc -> sc.getCourse().getCourseId() != null)
+				.collect(Collectors.toMap(
+						sc -> sc.getCourse().getCourseId(),
+						sc -> sc.getGrade() != null ? sc.getGrade() : BigDecimal.ZERO,
+						(existing, replacement) -> existing
+				));
+
+		// 新增：提取已选课程ID列表
+		List<String> enrolledCourseIds = enrolledCourses.stream()
+				.filter(sc -> sc.getCourse() != null)
 				.map(sc -> sc.getCourse().getCourseId())
+				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
 
 		model.addAttribute("courses", courses);
-		model.addAttribute("enrolledCourseIds", enrolledCourseIds); // 添加已选课程ID列表
+		model.addAttribute("gradeMap", gradeMap);
+		model.addAttribute("enrolledCourseIds", enrolledCourseIds); // 新增关键行
 		return "student/courses";
 	}
 

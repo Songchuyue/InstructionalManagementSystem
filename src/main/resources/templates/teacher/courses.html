@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>授课课程</title>
+    <link href="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>我的授课课程</h2>
+    <a th:href="@{/teacher/dashboard}" class="btn btn-secondary mb-3">返回主页</a>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>课程ID</th>
+            <th>课程名称</th>
+            <th>学分</th>
+            <th>学期</th>
+            <th>教室</th>
+            <th>选课人数</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${courses}">
+            <td th:text="${course.courseId}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.credit}"></td>
+            <td th:text="${course.semester}"></td>
+            <td th:text="${course.classroom}"></td>
+            <td th:text="${course.studentCount}"></td>
+            <td>
+                <a th:href="@{/course/grade-management(courseId=${course.courseId})}"
+                   class="btn btn-warning btn-sm">成绩管理</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

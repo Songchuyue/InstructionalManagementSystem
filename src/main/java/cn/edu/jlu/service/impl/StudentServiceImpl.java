@@ -8,6 +8,7 @@ import cn.edu.jlu.repository.CourseRepository;
 import cn.edu.jlu.repository.StudentCourseRepository;
 import cn.edu.jlu.repository.StudentRepository;
 import cn.edu.jlu.service.StudentService;
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -69,20 +70,30 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	@Transactional
 	public void enrollStudentInCourse(String studentId, String courseId) throws Exception {
-		// 检查是否已选课
-		if (studentCourseRepository.existsByStudent_StudentIdAndCourse_CourseId(studentId, courseId)) {
-			throw new Exception("您已选过该课程！");
+		// 加强参数校验（新增）
+		if (StringUtils.isBlank(studentId) || StringUtils.isBlank(courseId)) {
+			throw new IllegalArgumentException("学生ID和课程ID不能为空");
 		}
 
-		Student student = studentRepository.findById(studentId)
-				.orElseThrow(() -> new Exception("学生不存在"));
+		// 获取课程实体（新增异常信息细化）
 		Course course = courseRepository.findById(courseId)
-				.orElseThrow(() -> new Exception("课程不存在"));
+				.orElseThrow(() -> new Exception("课程不存在，ID：" + courseId));
 
+		if (studentCourseRepository.existsByStudent_StudentIdAndCourse_CourseId(studentId, courseId)) {
+			throw new Exception("重复选课：学生[" + studentId + "] 课程[" + courseId + "]");
+		}
+
+		// 获取学生实体（新增异常信息细化）
+		Student student = studentRepository.findById(studentId)
+				.orElseThrow(() -> new Exception("学生不存在，ID：" + studentId));
+
+		// 创建选课记录（关键修改）
 		StudentCourse studentCourse = new StudentCourse();
-		studentCourse.setStudent(student);
-		studentCourse.setCourse(course);
-		studentCourse.setGrade(null); // 初始无成绩
+		studentCourse.setStudentId(studentId);  // 显式设置主键字段
+		studentCourse.setCourseId(courseId);     // 显式设置主键字段
+		studentCourse.setStudent(student);      // 保持关联关系
+		studentCourse.setCourse(course);        // 保持关联关系
+		studentCourse.setGrade(null);
 
 		studentCourseRepository.save(studentCourse);
 	}

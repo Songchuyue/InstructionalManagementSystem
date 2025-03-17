@@ -22,6 +22,7 @@
             <th>学分</th>
             <th>学期</th>
             <th>教室</th>
+            <th>当前成绩</th>
             <th>操作</th>
         </tr>
         </thead>
@@ -35,8 +36,20 @@
             <td th:text="${course.semester}"></td>
             <td th:text="${course.classroom}"></td>
             <td>
+                <span th:if="${gradeMap.containsKey(course.courseId)}">
+                    <span th:if="${gradeMap.get(course.courseId)} != null and ${gradeMap.get(course.courseId)} != 0"
+                          th:text="${#numbers.formatDecimal(gradeMap.get(course.courseId), 1, 2)}">
+                    </span>
+                    <span th:if="${gradeMap.get(course.courseId)} == null or ${gradeMap.get(course.courseId)} == 0"
+                          class="text-muted">未公布
+                    </span>
+                </span>
+                <span th:unless="${gradeMap.containsKey(course.courseId)}">-</span>
+            </td>
+            <td>
+            <td>
                 <!-- 选课表单 -->
-                <form th:unless="${#lists.contains(enrolledCourseIds, course.courseId)}"
+                <form th:if="${not #lists.contains(enrolledCourseIds, course.courseId)}"
                       th:action="@{/student/enroll}"
                       method="post">
                     <input type="hidden" name="courseId" th:value="${course.courseId}">
@@ -44,7 +57,7 @@
                 </form>
 
                 <!-- 退课表单 -->
-                <form th:if="${#lists.contains(enrolledCourseIds, course.courseId)}"
+                <form th:unless="${not #lists.contains(enrolledCourseIds, course.courseId)}"
                       th:action="@{/student/drop}"
                       method="post">
                     <input type="hidden" name="courseId" th:value="${course.courseId}">

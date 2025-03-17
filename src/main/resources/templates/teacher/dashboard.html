@@ -82,7 +82,7 @@
     <!-- 折叠表单 -->
     <div class="collapse mt-3" id="editForm">
         <div class="card card-body">
-            <form th:action="@{/teacher/updateInfo}" method="post" th:object="${updateForm}">
+            <form th:action="@{/course/updateInfo}" method="post" th:object="${updateForm}">
                 <!-- 年龄 -->
                 <div class="mb-3">
                     <label class="form-label">年龄</label>
@@ -121,7 +121,7 @@
 
     <!-- 新增课程查询按钮 -->
     <div class="mt-4">
-        <button class="btn btn-success" onclick="findCourses()">查看授课课程</button>
+        <a th:href="@{/teacher/teaching-courses}" class="btn btn-success">查看授课课程</a>
     </div>
 
     <!-- 课程展示容器 -->
