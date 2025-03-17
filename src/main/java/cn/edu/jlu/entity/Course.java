@@ -42,4 +42,14 @@ public class Course {
 	public String getTeacherId() {
 		return teacher != null ? teacher.getTeacherId() : null;
 	}
+
+	@Transient
+	public String getTeacherName() {
+		return teacher != null ? teacher.getName() : "未知教师";
+	}
+
+	@Transient
+	public String getTeacherEmail() {
+		return teacher != null ? teacher.getEmail() : "无邮箱";
+	}
 }

@@ -19,7 +19,7 @@
             <p class="card-text"><strong>姓名：</strong><span th:text="${student.name}"></span></p>
             <p class="card-text"><strong>性别：</strong><span th:text="${student.gender}"></span></p>
             <p class="card-text"><strong>年龄：</strong><span th:text="${student.age}"></span></p>
-            <p class="card-text"><strong>年级：</strong><span th:text="${student.grade}"></span></p>
+            <p class="card-text"><strong>年级：</strong><span th:text="${student.semester}"></span></p>
             <p class="card-text"><strong>专业：</strong><span th:text="${student.major}"></span></p>
             <p class="card-text"><strong>密码：</strong><span th:text="${student.password}"></span></p>
 
@@ -56,13 +56,13 @@
                 <!-- 年级 -->
                 <div class="mb-3">
                     <label class="form-label">年级</label>
-                    <select class="form-select" th:field="*{grade}" required>
+                    <select class="form-select" th:field="*{semester}" required>
                         <option value="大一">大一</option>
                         <option value="大二">大二</option>
                         <option value="大三">大三</option>
                         <option value="大四">大四</option>
                     </select>
-                    <small class="text-danger" th:if="${#fields.hasErrors('grade')}" th:errors="*{grade}"></small>
+                    <small class="text-danger" th:if="${#fields.hasErrors('semester')}" th:errors="*{semester}"></small>
                 </div>
 
                 <!-- 专业 -->

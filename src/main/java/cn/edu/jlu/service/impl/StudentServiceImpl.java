@@ -1,9 +1,14 @@
 package cn.edu.jlu.service.impl;
 
 import cn.edu.jlu.dto.StudentDTO;
+import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.entity.Student;
+import cn.edu.jlu.entity.StudentCourse;
+import cn.edu.jlu.repository.CourseRepository;
+import cn.edu.jlu.repository.StudentCourseRepository;
 import cn.edu.jlu.repository.StudentRepository;
 import cn.edu.jlu.service.StudentService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,10 +16,17 @@ import java.time.LocalDateTime;
 @Service  // 关键注解：标记为 Spring 管理的 Bean
 public class StudentServiceImpl implements StudentService {
 	private final StudentRepository studentRepository;
+	private final StudentCourseRepository studentCourseRepository;
+	private final CourseRepository courseRepository;
 
-	// 构造函数注入依赖
-	public StudentServiceImpl(StudentRepository studentRepository) {
+	public StudentServiceImpl(
+			StudentRepository studentRepository,
+			StudentCourseRepository studentCourseRepository,
+			CourseRepository courseRepository
+	) {
 		this.studentRepository = studentRepository;
+		this.studentCourseRepository = studentCourseRepository;
+		this.courseRepository = courseRepository;
 	}
 
 	@Override
@@ -38,8 +50,8 @@ public class StudentServiceImpl implements StudentService {
 		if (studentFromSession.getAge() != null) {
 			managedStudent.setAge(studentFromSession.getAge());
 		}
-		if (studentFromSession.getGrade() != null) {
-			managedStudent.setGrade(studentFromSession.getGrade());
+		if (studentFromSession.getSemester() != null) {
+			managedStudent.setSemester(studentFromSession.getSemester());
 		}
 		if (studentFromSession.getMajor() != null) {
 			managedStudent.setMajor(studentFromSession.getMajor());
@@ -52,5 +64,40 @@ public class StudentServiceImpl implements StudentService {
 		managedStudent.setUpdateTime(LocalDateTime.now()); // 临时手动设置，验证问题
 
 		return studentRepository.save(managedStudent);
+	}
+
+	@Override
+	@Transactional
+	public void enrollStudentInCourse(String studentId, String courseId) throws Exception {
+		// 检查是否已选课
+		if (studentCourseRepository.existsByStudent_StudentIdAndCourse_CourseId(studentId, courseId)) {
+			throw new Exception("您已选过该课程！");
+		}
+
+		Student student = studentRepository.findById(studentId)
+				.orElseThrow(() -> new Exception("学生不存在"));
+		Course course = courseRepository.findById(courseId)
+				.orElseThrow(() -> new Exception("课程不存在"));
+
+		StudentCourse studentCourse = new StudentCourse();
+		studentCourse.setStudent(student);
+		studentCourse.setCourse(course);
+		studentCourse.setGrade(null); // 初始无成绩
+
+		studentCourseRepository.save(studentCourse);
+	}
+
+	@Override
+	@Transactional
+	public void dropCourse(String studentId, String courseId) throws Exception {
+		// 检查是否存在选课记录
+		if (!studentCourseRepository.existsByStudent_StudentIdAndCourse_CourseId(studentId, courseId)) {
+			throw new Exception("未找到该选课记录");
+		}
+
+		// 直接通过复合主键删除
+		studentCourseRepository.deleteById(
+				new StudentCourse.StudentCourseId(studentId, courseId)
+		);
 	}
 }

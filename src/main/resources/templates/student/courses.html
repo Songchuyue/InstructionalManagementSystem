@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>选课系统</title>
+    <link href="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <!-- 显示操作提示 -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <h2>可选课程列表</h2>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>课程编号</th>
+            <th>课程名称</th>
+            <th>授课教师</th>
+            <th>教师邮箱</th>
+            <th>学分</th>
+            <th>学期</th>
+            <th>教室</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${courses}">
+            <td th:text="${course.courseId}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.teacherName}"></td> <!-- 新增教师姓名 -->
+            <td th:text="${course.teacherEmail}"></td> <!-- 新增教师邮箱 -->
+            <td th:text="${course.credit}"></td>
+            <td th:text="${course.semester}"></td>
+            <td th:text="${course.classroom}"></td>
+            <td>
+                <!-- 选课表单 -->
+                <form th:unless="${#lists.contains(enrolledCourseIds, course.courseId)}"
+                      th:action="@{/student/enroll}"
+                      method="post">
+                    <input type="hidden" name="courseId" th:value="${course.courseId}">
+                    <button type="submit" class="btn btn-success btn-sm">选课</button>
+                </form>
+
+                <!-- 退课表单 -->
+                <form th:if="${#lists.contains(enrolledCourseIds, course.courseId)}"
+                      th:action="@{/student/drop}"
+                      method="post">
+                    <input type="hidden" name="courseId" th:value="${course.courseId}">
+                    <button type="submit" class="btn btn-danger btn-sm">退课</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a th:href="@{/student/dashboard}" class="btn btn-secondary">返回主页</a>
+</div>
+<script src="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

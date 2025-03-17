@@ -32,7 +32,7 @@ public class Student {
 	private Integer age;
 
 	@Column(length = 20)
-	private String grade;
+	private String semester;
 
 	@Column(length = 100)
 	private String major;

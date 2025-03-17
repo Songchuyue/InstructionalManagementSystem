@@ -5,4 +5,6 @@ import java.util.List;
 
 public interface CourseService {
 	List<Course> findByTeacherId(String teacherId);
+
+	List<Course> findBySemester(String semester);
 }

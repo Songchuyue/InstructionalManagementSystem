@@ -12,4 +12,8 @@ public interface StudentService {
 	Student validateLogin(StudentDTO studentDTO);
 
 	Student updateStudentInfo(Student student);
+
+	void enrollStudentInCourse(String studentId, String courseId) throws Exception;
+
+	void dropCourse(String studentId, String courseId) throws Exception;
 }
