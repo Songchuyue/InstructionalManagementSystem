@@ -32,7 +32,8 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public Student validateLogin(StudentDTO studentDTO) {
-		Student student = studentRepository.findByStudentId(studentDTO.getStudentId());
+//		Student student = studentRepository.findByStudentId(studentDTO.getStudentId());
+		Student student = studentRepository.findById(studentDTO.getStudentId()).orElse(null);
 		if (student == null || !student.getPassword().equals(studentDTO.getPassword())) {
 			return null;
 		}
@@ -44,7 +45,9 @@ public class StudentServiceImpl implements StudentService {
 	public Student updateStudentInfo(Student studentFromSession) {
 		if (studentFromSession == null) return null;
 
-		// 从数据库加载托管实体
+		/* findById返回<Optional>Student, orElse(null)表示若查询到结果则返回Student对象, 否则返回null
+		 * 从数据库加载托管实体(必须通过findById或类似方法从数据库加载), 其修改会自动同步到数据库
+		 */
 		Student managedStudent = studentRepository.findById(studentFromSession.getStudentId()).orElse(null);
 		if (managedStudent == null) return null;
 
@@ -57,10 +60,10 @@ public class StudentServiceImpl implements StudentService {
 			managedStudent.setPassword(studentFromSession.getPassword());
 		}
 
-		// 显式触发更新（即使字段值未变）
-		managedStudent.setUpdateTime(LocalDateTime.now()); // 临时手动设置，验证问题
+		managedStudent.setUpdateTime(LocalDateTime.now());
 
-		return studentRepository.save(managedStudent);
+//		return studentRepository.save(managedStudent);
+		return managedStudent;
 	}
 
 	@Override
