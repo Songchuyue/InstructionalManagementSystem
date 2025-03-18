@@ -4,53 +4,110 @@
     <meta charset="UTF-8">
     <title>学生主页</title>
     <link href="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
-<body>
-<div class="container mt-5">
-    <!-- 显示操作提示 -->
-    <div th:if="${updateSuccess}" class="alert alert-success" th:text="${updateSuccess}"></div>
-    <div th:if="${updateError}" class="alert alert-danger" th:text="${updateError}"></div>
-
-    <h2>学生信息</h2>
-    <div class="card mt-3">
+<body class="bg-light">
+<div class="container py-5">
+    <!-- 学生信息卡片 -->
+    <div class="card mb-4 shadow">
+        <div class="card-header bg-info text-white">
+            <h3 class="card-title mb-0">
+                <i class="bi bi-person-vcard"></i> 学生信息
+            </h3>
+        </div>
         <div class="card-body">
-            <!-- 基本信息 -->
-            <p class="card-text"><strong>学号：</strong><span th:text="${student.studentId}"></span></p>
-            <p class="card-text"><strong>姓名：</strong><span th:text="${student.name}"></span></p>
-            <p class="card-text"><strong>性别：</strong><span th:text="${student.gender}"></span></p>
-            <p class="card-text"><strong>年龄：</strong><span th:text="${student.age}"></span></p>
-            <p class="card-text"><strong>年级：</strong><span th:text="${student.semester}"></span></p>
-            <p class="card-text"><strong>专业：</strong><span th:text="${student.major}"></span></p>
-            <p class="card-text"><strong>密码：</strong><span th:text="${student.password}"></span></p>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">学号</dt>
+                <dd class="col-sm-9" th:text="${student.studentId}"></dd>
 
-            <!-- 时间格式化显示 -->
-            <p class="card-text">
-                <strong>创建时间：</strong>
-                <span th:text="${#temporals.format(student.createTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
-            </p>
-            <p class="card-text">
-                <strong>修改时间：</strong>
-                <span th:text="${#temporals.format(student.updateTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
-            </p>
+                <dt class="col-sm-3">姓名</dt>
+                <dd class="col-sm-9" th:text="${student.name}"></dd>
+
+                <dt class="col-sm-3">性别</dt>
+                <dd class="col-sm-9" th:text="${student.gender}"></dd>
+
+                <dt class="col-sm-3">年龄</dt>
+                <dd class="col-sm-9" th:text="${student.age}"></dd>
+
+                <dt class="col-sm-3">年级</dt>
+                <dd class="col-sm-9" th:text="${student.semester}"></dd>
+
+                <dt class="col-sm-3">专业</dt>
+                <dd class="col-sm-9" th:text="${student.major}"></dd>
+
+                <dt class="col-sm-3">密码</dt>
+                <dd class="col-sm-9">
+                    <span class="text-muted">••••••••</span>
+                    <small class="ms-2 text-muted">（加密存储）</small>
+                </dd>
+
+                <dt class="col-sm-3">创建时间</dt>
+                <dd class="col-sm-9" th:text="${#temporals.format(student.createTime, 'yyyy-MM-dd HH:mm')}"></dd>
+
+                <dt class="col-sm-3">更新时间</dt>
+                <dd class="col-sm-9" th:text="${#temporals.format(student.updateTime, 'yyyy-MM-dd HH:mm')}"></dd>
+            </dl>
         </div>
     </div>
 
-    <!-- 修改信息按钮 -->
-    <div class="mt-4">
-        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#editForm">
-            修改信息
-        </button>
+    <!-- 操作面板 -->
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="card-title mb-0">
+                <i class="bi bi-gear"></i> 学生服务
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- 修改信息 -->
+                <div class="col-md-6">
+                    <button class="btn btn-outline-primary w-100 h-100 py-3"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#editForm">
+                        <i class="bi bi-pencil-square fs-2"></i>
+                        <div class="mt-2">修改信息</div>
+                    </button>
+                </div>
+
+                <!-- 选课系统 -->
+                <div class="col-md-6">
+                    <a th:href="@{/student/courses}" class="btn btn-outline-success w-100 h-100 py-3">
+                        <i class="bi bi-journal-bookmark fs-2"></i>
+                        <div class="mt-2">课程管理</div>
+                    </a>
+                </div>
+
+                <!-- 退出登录 -->
+                <div class="col-12 mt-4">
+                    <form th:action="@{/student/logout}" method="post">
+                        <button type="submit" class="btn btn-danger w-100 py-2">
+                            <i class="bi bi-box-arrow-right"></i>
+                            安全退出
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 折叠表单 -->
-    <div class="collapse mt-3" id="editForm">
-        <div class="card card-body">
+    <div class="collapse mt-4" id="editForm">
+        <div class="card card-body shadow">
             <form th:action="@{/student/updateInfo}" method="post" th:object="${updateForm}">
+                <!-- 操作提示 -->
+                <div th:if="${updateSuccess}" class="alert alert-success mb-3"
+                     th:text="${updateSuccess}"></div>
+                <div th:if="${updateError}" class="alert alert-danger mb-3"
+                     th:text="${updateError}"></div>
+
                 <!-- 年龄 -->
                 <div class="mb-3">
                     <label class="form-label">年龄</label>
-                    <input type="number" class="form-control" th:field="*{age}" required>
-                    <small class="text-danger" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></small>
+                    <input type="number" class="form-control"
+                           th:field="*{age}" required min="16" max="40">
+                    <small class="text-danger" th:if="${#fields.hasErrors('age')}"
+                           th:errors="*{age}"></small>
                 </div>
 
                 <!-- 年级 -->
@@ -62,33 +119,36 @@
                         <option value="大三">大三</option>
                         <option value="大四">大四</option>
                     </select>
-                    <small class="text-danger" th:if="${#fields.hasErrors('semester')}" th:errors="*{semester}"></small>
+                    <small class="text-danger" th:if="${#fields.hasErrors('semester')}"
+                           th:errors="*{semester}"></small>
                 </div>
 
                 <!-- 专业 -->
                 <div class="mb-3">
                     <label class="form-label">专业</label>
-                    <input type="text" class="form-control" th:field="*{major}" required>
-                    <small class="text-danger" th:if="${#fields.hasErrors('major')}" th:errors="*{major}"></small>
+                    <input type="text" class="form-control"
+                           th:field="*{major}" required maxlength="20">
+                    <small class="text-danger" th:if="${#fields.hasErrors('major')}"
+                           th:errors="*{major}"></small>
                 </div>
 
                 <!-- 密码 -->
-                <div class="mb-3">
+                <div class="mb-4">
                     <label class="form-label">新密码（可选）</label>
-                    <input type="password" class="form-control" th:field="*{newPassword}">
+                    <input type="password" class="form-control"
+                           th:field="*{newPassword}" placeholder="输入新密码">
+                    <small class="form-text text-muted">留空则不修改密码</small>
                 </div>
 
-                <button type="submit" class="btn btn-primary">提交修改</button>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-2"></i>提交修改
+                    </button>
+                </div>
             </form>
         </div>
     </div>
-
-    <!-- 选课按钮 -->
-    <div class="mt-4">
-        <a th:href="@{/student/courses}" class="btn btn-success">进入选课</a>
-    </div>
 </div>
-<!-- Bootstrap JS 和依赖 -->
 <script src="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -82,6 +82,12 @@ public class StudentController {
 		return "student/dashboard";
 	}
 
+	@PostMapping("/logout")
+	public String logout(HttpSession session) {
+		session.removeAttribute("admin"); // 清除会话
+		return "redirect:/student/login";
+	}
+
 	@PostMapping("/updateInfo")
 	public String updateInfo(
 			@Valid @ModelAttribute("updateForm") StudentUpdateForm updateForm, // 绑定表单对象

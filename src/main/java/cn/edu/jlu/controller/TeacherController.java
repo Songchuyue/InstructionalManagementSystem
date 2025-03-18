@@ -76,6 +76,12 @@ public class TeacherController {
 		return "teacher/dashboard";
 	}
 
+	@PostMapping("/logout")
+	public String logout(HttpSession session) {
+		session.removeAttribute("admin"); // 清除会话
+		return "redirect:/teacher/login";
+	}
+
 	// 处理信息更新
 	@PostMapping("/updateInfo")
 	public String updateInfo(
