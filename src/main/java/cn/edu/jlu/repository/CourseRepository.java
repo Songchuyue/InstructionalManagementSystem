@@ -52,4 +52,7 @@ public interface CourseRepository extends JpaRepository<Course, String> {
 
 	@Query("SELECT COUNT(c) > 0 FROM Course c WHERE c.courseId = ?1 AND c.teacher.teacherId = ?2")
 	boolean existsByCourseIdAndTeacher_TeacherId(String courseId, String teacherId);
+
+	@Query("SELECT c FROM Course c JOIN FETCH c.teacher")
+	List<Course> findAllWithTeacher();
 }

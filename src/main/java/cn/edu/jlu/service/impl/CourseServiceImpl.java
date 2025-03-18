@@ -5,6 +5,7 @@ import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.repository.CourseRepository;
 import cn.edu.jlu.service.CourseService;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,5 +55,22 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public boolean existsByCourseIdAndTeacher(String courseId, String teacherId) {
 		return courseRepository.existsByCourseIdAndTeacher_TeacherId(courseId, teacherId);
+	}
+
+	@Override
+	public List<Course> findAllWithTeacher() {
+		return courseRepository.findAllWithTeacher();
+	}
+
+	@Override
+	@Transactional
+	public void closeCourse(String courseId) throws Exception {
+		Course course = courseRepository.findById(courseId)
+				.orElseThrow(() -> new Exception("课程不存在"));
+		if (course.getStatus() == 1) {
+			throw new Exception("课程已结课");
+		}
+		course.setStatus(1);
+		courseRepository.save(course);
 	}
 }

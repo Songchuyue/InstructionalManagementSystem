@@ -14,4 +14,8 @@ public interface CourseService {
 	Course validateTeacherCourse(String teacherId, String courseId);
 
 	boolean existsByCourseIdAndTeacher(String courseId, String teacherId);
+
+	List<Course> findAllWithTeacher();
+
+	void closeCourse(String courseId) throws Exception;
 }

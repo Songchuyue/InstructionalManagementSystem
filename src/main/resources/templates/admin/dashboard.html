@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>管理控制台</title>
+    <link href="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 新增 Bootstrap 图标 -->
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <!-- 管理员信息卡片 -->
+    <div class="card mb-4 shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">
+                <i class="bi bi-person-gear"></i> 管理员信息
+            </h3>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">管理员ID</dt>
+                <dd class="col-sm-9" th:text="${admin.adminId}">AD001</dd>
+
+                <dt class="col-sm-3">姓名</dt>
+                <dd class="col-sm-9" th:text="${admin.name}">管理员姓名</dd>
+
+                <dt class="col-sm-3">密码</dt>
+                <dd class="col-sm-9">
+                    <span class="text-muted">••••••••</span>
+                    <small class="ms-2 text-muted">（加密存储）</small>
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- 操作面板 -->
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h3 class="card-title mb-0">
+                <i class="bi bi-clipboard-check"></i> 管理操作
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- 课程管理 -->
+                <div class="col-md-6">
+                    <a href="/admin/courses" class="btn btn-outline-primary w-100 h-100 py-3">
+                        <i class="bi bi-journal-bookmark fs-2"></i>
+                        <div class="mt-2">课程管理</div>
+                    </a>
+                </div>
+
+                <div class="col-md-6">
+                    <button class="btn btn-outline-secondary w-100 h-100 py-3" disabled>
+                        <i class="bi bi-people fs-2"></i>
+                        <div class="mt-2">更多功能</div>
+                        <small class="text-muted">（开发中）</small>
+                    </button>
+                </div>
+
+                <!-- 退出登录 -->
+                <div class="col-12 mt-4">
+                    <form th:action="@{/admin/logout}" method="post">
+                        <button type="submit" class="btn btn-danger w-100 py-2">
+                            <i class="bi bi-box-arrow-right"></i>
+                            退出登录
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
