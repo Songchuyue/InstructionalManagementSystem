@@ -40,6 +40,7 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
+	@Transactional
 	public Student updateStudentInfo(Student studentFromSession) {
 		if (studentFromSession == null) return null;
 
@@ -47,17 +48,12 @@ public class StudentServiceImpl implements StudentService {
 		Student managedStudent = studentRepository.findById(studentFromSession.getStudentId()).orElse(null);
 		if (managedStudent == null) return null;
 
-		// 仅更新有变化的字段（避免 Hibernate 认为无变化而跳过更新）
-		if (studentFromSession.getAge() != null) {
-			managedStudent.setAge(studentFromSession.getAge());
-		}
-		if (studentFromSession.getSemester() != null) {
-			managedStudent.setSemester(studentFromSession.getSemester());
-		}
-		if (studentFromSession.getMajor() != null) {
-			managedStudent.setMajor(studentFromSession.getMajor());
-		}
-		if (studentFromSession.getPassword() != null) {
+		managedStudent.setAge(studentFromSession.getAge());
+		managedStudent.setSemester(studentFromSession.getSemester());
+		managedStudent.setMajor(studentFromSession.getMajor());
+
+		if (studentFromSession.getPassword() != null &&
+				!studentFromSession.getPassword().isEmpty()) {
 			managedStudent.setPassword(studentFromSession.getPassword());
 		}
 

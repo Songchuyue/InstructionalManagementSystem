@@ -101,15 +101,9 @@ public class StudentController {
 		}
 
 		// 更新字段
-		if (updateForm.getAge() != null) { // 用户填写了年龄
-			sessionStudent.setAge(updateForm.getAge());
-		}
-		if (updateForm.getSemester() != null && !updateForm.getSemester().isEmpty()) { // 用户填写了年级
-			sessionStudent.setSemester(updateForm.getSemester());
-		}
-		if (updateForm.getMajor() != null && !updateForm.getMajor().isEmpty()) { // 用户填写了专业
-			sessionStudent.setMajor(updateForm.getMajor());
-		}
+		sessionStudent.setAge(updateForm.getAge());
+		sessionStudent.setSemester(updateForm.getSemester());
+		sessionStudent.setMajor(updateForm.getMajor());
 
 		if (updateForm.getNewPassword() != null && !updateForm.getNewPassword().isEmpty()) {
 			sessionStudent.setPassword(updateForm.getNewPassword());

@@ -27,8 +27,6 @@ public class Student {
 	@Column(length = 10)
 	private String gender;
 
-	@Min(value = 10, message = "年龄不能小于10岁")
-	@Max(value = 100, message = "年龄不能超过100岁")
 	private Integer age;
 
 	@Column(length = 20)
