@@ -30,7 +30,7 @@
             <td th:text="${course.classroom}"></td>
             <td th:text="${course.studentCount}"></td>
             <td>
-                <a th:href="@{/course/grade-management(courseId=${course.courseId})}"
+                <a th:href="@{/teacher/grade-management(courseId=${course.courseId})}"
                    class="btn btn-warning btn-sm">成绩管理</a>
             </td>
         </tr>

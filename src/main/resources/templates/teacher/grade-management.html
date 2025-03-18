@@ -10,7 +10,7 @@
     <h2>成绩管理 - <span th:text="${course.courseName}"></span></h2>
     <a th:href="@{/teacher/teaching-courses}" class="btn btn-secondary mb-3">返回课程列表</a>
 
-    <form th:action="@{/course/update-grades}" method="post">
+    <form th:action="@{/teacher/update-grades}" method="post">
         <input type="hidden" name="courseId" th:value="${course.courseId}">
 
         <table class="table table-hover">
