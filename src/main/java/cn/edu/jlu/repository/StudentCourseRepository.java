@@ -11,7 +11,7 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, St
 	List<StudentCourse> findByCourse_CourseId(String courseId);
 	StudentCourse findByStudent_StudentIdAndCourse_CourseId(String studentId, String courseId);
 	boolean existsByStudent_StudentIdAndCourse_CourseId(String studentId, String courseId);
-	List<StudentCourse> findByStudent_StudentId(String studentId);
+//	List<StudentCourse> findByStudent_StudentId(String studentId);
 	@Query("SELECT sc FROM StudentCourse sc " +
 			"LEFT JOIN FETCH sc.course " +  // 使用LEFT JOIN防止课程不存在时报错
 			"WHERE sc.student.studentId = :studentId")

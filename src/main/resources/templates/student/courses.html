@@ -17,6 +17,7 @@
         <tr>
             <th>课程编号</th>
             <th>课程名称</th>
+            <th>状态</th>
             <th>授课教师</th>
             <th>教师邮箱</th>
             <th>学分</th>
@@ -30,6 +31,9 @@
         <tr th:each="course : ${courses}">
             <td th:text="${course.courseId}"></td>
             <td th:text="${course.courseName}"></td>
+            <td>
+                <span th:text="${course.status == 1} ? '已结课' : '未结课'"></span>
+            </td>
             <td th:text="${course.teacherName}"></td> <!-- 新增教师姓名 -->
             <td th:text="${course.teacherEmail}"></td> <!-- 新增教师邮箱 -->
             <td th:text="${course.credit}"></td>
@@ -47,7 +51,6 @@
                 <span th:unless="${gradeMap.containsKey(course.courseId)}">-</span>
             </td>
             <td>
-            <td>
                 <!-- 选课表单 -->
                 <form th:if="${not #lists.contains(enrolledCourseIds, course.courseId)}"
                       th:action="@{/student/enroll}"
@@ -57,12 +60,29 @@
                 </form>
 
                 <!-- 退课表单 -->
-                <form th:unless="${not #lists.contains(enrolledCourseIds, course.courseId)}"
-                      th:action="@{/student/drop}"
-                      method="post">
-                    <input type="hidden" name="courseId" th:value="${course.courseId}">
-                    <button type="submit" class="btn btn-danger btn-sm">退课</button>
-                </form>
+                <div th:if="${#lists.contains(enrolledCourseIds, course.courseId)}">
+                    <!-- 定义条件变量 -->
+                    <th:block th:with="hasValidGrade=${gradeMap.containsKey(course.courseId)}
+                          and ${gradeMap.get(course.courseId)} != null
+                          and ${gradeMap.get(course.courseId).compareTo(T(java.math.BigDecimal).ZERO) != 0}">
+                        <!-- 禁用按钮 -->
+                        <button th:if="${hasValidGrade}"
+                                class="btn btn-danger btn-sm"
+                                disabled
+                                title="已发布成绩，无法退课">
+                            退课（不可用）
+                        </button>
+
+                        <!-- 正常退课按钮 -->
+                        <form th:unless="${hasValidGrade}"
+                              th:action="@{/student/drop}"
+                              method="post"
+                              style="display: inline;">
+                            <input type="hidden" name="courseId" th:value="${course.courseId}">
+                            <button type="submit" class="btn btn-danger btn-sm">退课</button>
+                        </form>
+                    </th:block>
+                </div>
             </td>
         </tr>
         </tbody>

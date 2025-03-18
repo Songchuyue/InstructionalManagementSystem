@@ -10,20 +10,42 @@ import java.util.List;
 public interface CourseRepository extends JpaRepository<Course, String> {
 	List<Course> findByTeacher_TeacherId(String teacherId);
 
-	// 新增带教师信息的查询
+	/*
+	 *SELECT
+	 *     c.course_id,
+	 *     c.course_name,
+	 *     c.teacher_id,
+	 *     c.credit,
+	 *     c.semester,
+	 *     c.classroom,
+	 *     t.teacher_id,
+	 *     t.name,
+	 *     t.password,
+	 *     t.gender,
+	 *     t.age,
+	 *     t.email,
+	 *     t.create_time,
+	 *     t.update_time
+	 * FROM
+	 *     courses c
+	 * INNER JOIN
+	 *     teachers t ON c.teacher_id = t.teacher_id
+	 * WHERE
+	 *     c.semester = ?;
+	 */
 	@Query("SELECT c FROM Course c JOIN FETCH c.teacher WHERE c.semester = :semester")
 	List<Course> findBySemesterWithTeacher(@Param("semester") String semester);
 
-	@Query("SELECT c.courseId, c.courseName, c.credit, c.semester, c.classroom, COUNT(sc.student) " +
+	@Query("SELECT c.courseId, c.courseName, c.status, c.credit, c.semester, c.classroom, COUNT(sc.student) " +
 			"FROM Course c " +
 			"LEFT JOIN c.studentCourses sc " +
 			"WHERE c.teacher.teacherId = :teacherId " +
-			"GROUP BY c.courseId, c.courseName, c.credit, c.semester, c.classroom")
+			"GROUP BY c.courseId, c.courseName, c.status, c.credit, c.semester, c.classroom")
 	List<Object[]> findCoursesWithStudentCount(@Param("teacherId") String teacherId);
 
-	@Query("SELECT COUNT(c) > 0 FROM Course c WHERE c.courseId = :courseId AND c.teacher.teacherId = :teacherId")
-	boolean existsByCourseIdAndTeacher(@Param("courseId") String courseId,
-									   @Param("teacherId") String teacherId);
+//	@Query("SELECT COUNT(c) > 0 FROM Course c WHERE c.courseId = :courseId AND c.teacher.teacherId = :teacherId")
+//	boolean existsByCourseIdAndTeacher(@Param("courseId") String courseId,
+//									   @Param("teacherId") String teacherId);
 
 	@Query("SELECT c FROM Course c WHERE c.courseId = ?1 AND c.teacher.teacherId = ?2")
 	Course findByCourseIdAndTeacher_TeacherId(String courseId, String teacherId);

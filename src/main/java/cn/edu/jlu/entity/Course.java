@@ -31,6 +31,9 @@ public class Course {
 	@Column(length = 100)
 	private String classroom;
 
+	@Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
+	private Integer status;
+
 	@OneToMany(
 			mappedBy = "course",
 			cascade = CascadeType.ALL,

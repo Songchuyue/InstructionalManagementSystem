@@ -48,4 +48,10 @@ public class StudentCourseServiceImpl implements StudentCourseService {
 			studentCourseRepository.save(sc);
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true) // 添加事务注解
+	public List<StudentCourse> getEnrolledCoursesWithDetails(String studentId) {
+		return studentCourseRepository.findByStudentWithCourses(studentId);
+	}
 }

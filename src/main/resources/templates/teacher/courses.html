@@ -15,23 +15,33 @@
         <tr>
             <th>课程ID</th>
             <th>课程名称</th>
+            <th>状态</th>
             <th>学分</th>
             <th>学期</th>
             <th>教室</th>
             <th>选课人数</th>
+            <th>操作</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="course : ${courses}">
             <td th:text="${course.courseId}"></td>
             <td th:text="${course.courseName}"></td>
+            <td>
+                <span th:text="${course.status == 1} ? '已结课' : '未结课'"></span>
+            </td>
             <td th:text="${course.credit}"></td>
             <td th:text="${course.semester}"></td>
             <td th:text="${course.classroom}"></td>
             <td th:text="${course.studentCount}"></td>
             <td>
                 <a th:href="@{/teacher/grade-management(courseId=${course.courseId})}"
-                   class="btn btn-warning btn-sm">成绩管理</a>
+                   th:disabled="${course.status == 1}"
+                   th:classappend="${course.status == 1} ? 'disabled' : ''"
+                   class="btn btn-warning btn-sm"
+                   title="${course.status == 1} ? '课程已结课，无法修改成绩' : ''">
+                    成绩管理
+                </a>
             </td>
         </tr>
         </tbody>

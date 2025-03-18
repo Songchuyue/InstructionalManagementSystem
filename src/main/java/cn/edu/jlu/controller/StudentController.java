@@ -5,8 +5,8 @@ import cn.edu.jlu.dto.StudentUpdateForm;
 import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.entity.Student;
 import cn.edu.jlu.entity.StudentCourse;
-import cn.edu.jlu.repository.StudentCourseRepository;
 import cn.edu.jlu.service.CourseService;
+import cn.edu.jlu.service.StudentCourseService;
 import cn.edu.jlu.service.StudentService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -27,16 +27,16 @@ import java.util.stream.Collectors;
 public class StudentController {
 	private final StudentService studentService;
 	private final CourseService courseService;
-	private final StudentCourseRepository studentCourseRepository; // 新增
+	private final StudentCourseService studentCourseService;
 
 	public StudentController(
 			StudentService studentService,
 			CourseService courseService,
-			StudentCourseRepository studentCourseRepository // 新增注入
+			StudentCourseService studentCourseService
 	) {
 		this.studentService = studentService;
 		this.courseService = courseService;
-		this.studentCourseRepository = studentCourseRepository; // 初始化
+		this.studentCourseService = studentCourseService;
 	}
 
 	// 显示登录页面
@@ -122,6 +122,14 @@ public class StudentController {
 		return "redirect:/student/dashboard";
 	}
 
+	/*
+	 *课程页面应该展示什么呢?
+	 * 1, 展示所有符合自己年级的课程(课程名, 授课老师, 教师, 成绩...)
+	 * 2, 如果有自己选的课, 那么成绩栏应该为"分数/未公布", 否则显示"-"
+	 * 3,  应该有选课和退课按钮, 选课之后可以退课
+	 * 4, 什么时候不能退课? 出成绩之后不能退
+	 * 5, 对于管理员而言, 如果一门课的成绩都出了, 那么就可以选择结课了, 需要显示结课
+	 */
 	@GetMapping("/courses")
 	public String showCourses(HttpSession session, Model model) {
 		Student student = (Student) session.getAttribute("student");
@@ -131,7 +139,7 @@ public class StudentController {
 		List<Course> courses = courseService.findBySemester(student.getSemester());
 
 		// 获取已选课程及成绩（包含课程信息的预加载）
-		List<StudentCourse> enrolledCourses = studentCourseRepository.findByStudentWithCourses(student.getStudentId());
+		List<StudentCourse> enrolledCourses = studentCourseService.getEnrolledCoursesWithDetails(student.getStudentId());
 
 		// 创建课程ID到成绩的快速查找Map
 		Map<String, BigDecimal> gradeMap = enrolledCourses.stream()

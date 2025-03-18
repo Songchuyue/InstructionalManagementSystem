@@ -4,6 +4,7 @@ import cn.edu.jlu.dto.CourseWithEnrollment;
 import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.repository.CourseRepository;
 import cn.edu.jlu.service.CourseService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,13 +34,14 @@ public class CourseServiceImpl implements CourseService {
 		return results.stream().map(result -> {
 			String courseId = (String) result[0];
 			String courseName = (String) result[1];
-			Integer credit = (Integer) result[2];
-			String semester = (String) result[3];
-			String classroom = (String) result[4];
-			Long count = (Long) result[5];
+			Integer status =  (Integer) result[2];
+			Integer credit = (Integer) result[3];
+			String semester = (String) result[4];
+			String classroom = (String) result[5];
+			Long count = (Long) result[6];
 
 			return new CourseWithEnrollment(
-					courseId, courseName, credit, semester, classroom, count
+					courseId, courseName, status, credit, semester, classroom, count
 			);
 		}).collect(Collectors.toList());
 	}
