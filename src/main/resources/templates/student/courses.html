@@ -52,7 +52,7 @@
             </td>
             <td>
                 <!-- 选课表单 -->
-                <form th:if="${not #lists.contains(enrolledCourseIds, course.courseId)}"
+                <form th:if="${course.status != 1 and not #lists.contains(enrolledCourseIds, course.courseId)}"
                       th:action="@{/student/enroll}"
                       method="post">
                     <input type="hidden" name="courseId" th:value="${course.courseId}">
@@ -61,7 +61,6 @@
 
                 <!-- 退课表单 -->
                 <div th:if="${#lists.contains(enrolledCourseIds, course.courseId)}">
-                    <!-- 定义条件变量 -->
                     <th:block th:with="hasValidGrade=${gradeMap.containsKey(course.courseId)}
                           and ${gradeMap.get(course.courseId)} != null
                           and ${gradeMap.get(course.courseId).compareTo(T(java.math.BigDecimal).ZERO) != 0}">
@@ -72,8 +71,6 @@
                                 title="已发布成绩，无法退课">
                             退课（不可用）
                         </button>
-
-                        <!-- 正常退课按钮 -->
                         <form th:unless="${hasValidGrade}"
                               th:action="@{/student/drop}"
                               method="post"

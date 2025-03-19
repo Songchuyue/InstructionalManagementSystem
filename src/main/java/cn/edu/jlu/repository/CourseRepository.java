@@ -1,5 +1,6 @@
 package cn.edu.jlu.repository;
 
+import cn.edu.jlu.dto.AdminCourseDTO;
 import cn.edu.jlu.entity.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -55,4 +56,16 @@ public interface CourseRepository extends JpaRepository<Course, String> {
 
 	@Query("SELECT c FROM Course c JOIN FETCH c.teacher")
 	List<Course> findAllWithTeacher();
+
+	@Query("SELECT new cn.edu.jlu.dto.AdminCourseDTO( " +
+			"c.courseId, c.courseName, c.status, t.name, t.email, " +
+			"c.credit, c.semester, c.classroom, " +
+			"COUNT(sc.studentId), " +
+			"SUM(CASE WHEN sc.grade IS NULL THEN 1 ELSE 0 END) = 0) " +
+			"FROM Course c " +
+			"JOIN c.teacher t " +
+			"LEFT JOIN c.studentCourses sc " +
+			"GROUP BY c.courseId, c.courseName, c.status, t.name, t.email, " +
+			"c.credit, c.semester, c.classroom")
+	List<AdminCourseDTO> findAdminCourseData();
 }

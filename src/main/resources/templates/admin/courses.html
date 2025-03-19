@@ -7,7 +7,6 @@
 </head>
 <body>
 <div class="container mt-5">
-    <!-- 显示操作提示 -->
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
@@ -23,6 +22,8 @@
             <th>学分</th>
             <th>学期</th>
             <th>教室</th>
+            <th>选课人数</th>
+            <th>允许结课</th>
             <th>操作</th>
         </tr>
         </thead>
@@ -33,25 +34,51 @@
             <td>
                 <span th:text="${course.status == 1} ? '已结课' : '未结课'"></span>
             </td>
-            <td th:text="${course.teacher.name}"></td>
-            <td th:text="${course.teacher.email}"></td>
+            <td th:text="${course.teacherName}"></td>
+            <td th:text="${course.teacherEmail}"></td>
             <td th:text="${course.credit}"></td>
             <td th:text="${course.semester}"></td>
             <td th:text="${course.classroom}"></td>
+            <td th:text="${course.studentCount}"></td>
+            <!-- 允许结课列 -->
             <td>
-                <!-- 结课按钮 -->
+                <!-- 状态优先级最高 -->
+                <span th:if="${course.status == 1}" class="text-muted">已结课</span>
+                <!-- 未结课时显示评分状态 -->
+                <span th:unless="${course.status == 1}">
+                    <span th:if="${course.allGraded}" class="text-success">✔️ 可结课</span>
+                    <span th:unless="${course.allGraded}" class="text-danger">❌ 存在未评分学生</span>
+                </span>
+            </td>
+
+            <!-- 操作列 -->
+            <td>
                 <form th:action="@{/admin/close-course}" method="post">
                     <input type="hidden" name="courseId" th:value="${course.courseId}">
-                    <button th:if="${course.status != 1}"
-                            type="submit"
-                            class="btn btn-warning btn-sm">
-                        设为已结课
-                    </button>
+
+                    <!-- 已结课状态 -->
                     <button th:if="${course.status == 1}"
                             disabled
                             class="btn btn-secondary btn-sm">
                         已结课
                     </button>
+
+                    <!-- 未结课状态 -->
+                    <div th:unless="${course.status == 1}">
+                        <!-- 允许结课 -->
+                        <button th:if="${course.allGraded}"
+                                type="submit"
+                                class="btn btn-warning btn-sm">
+                            设为已结课
+                        </button>
+                        <!-- 禁止结课 -->
+                        <button th:unless="${course.allGraded}"
+                                disabled
+                                class="btn btn-secondary btn-sm"
+                                title="存在未评分学生">
+                            禁止结课
+                        </button>
+                    </div>
                 </form>
             </td>
         </tr>
@@ -59,6 +86,5 @@
     </table>
     <a th:href="@{/admin/dashboard}" class="btn btn-secondary">返回主页</a>
 </div>
-<script src="https://fastly.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,8 +1,10 @@
 package cn.edu.jlu.service.impl;
 
+import cn.edu.jlu.dto.AdminCourseDTO;
 import cn.edu.jlu.dto.CourseWithEnrollment;
 import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.repository.CourseRepository;
+import cn.edu.jlu.repository.StudentCourseRepository;
 import cn.edu.jlu.service.CourseService;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
@@ -13,9 +15,11 @@ import java.util.stream.Collectors;
 @Service
 public class CourseServiceImpl implements CourseService {
 	private final CourseRepository courseRepository;
+	private final StudentCourseRepository studentCourseRepository;
 
-	public CourseServiceImpl(CourseRepository courseRepository) {
+	public CourseServiceImpl(CourseRepository courseRepository, StudentCourseRepository studentCourseRepository) {
 		this.courseRepository = courseRepository;
+		this.studentCourseRepository = studentCourseRepository;
 	}
 
 	@Override
@@ -62,14 +66,42 @@ public class CourseServiceImpl implements CourseService {
 		return courseRepository.findAllWithTeacher();
 	}
 
+//	@Override
+//	@Transactional
+//	public void closeCourse(String courseId) throws Exception {
+//		Course course = courseRepository.findById(courseId)
+//				.orElseThrow(() -> new Exception("课程不存在"));
+//		if (course.getStatus() == 1) {
+//			throw new Exception("课程已结课");
+//		}
+//		course.setStatus(1);
+//		courseRepository.save(course);
+//	}
+
+	@Override
+	public List<AdminCourseDTO> findAdminCourseData() {
+		return courseRepository.findAdminCourseData();
+	}
+
+	@Override
+	public void validateCourseClosable(String courseId) throws Exception {
+		// 检查是否存在未评分学生
+		long ungradedCount = studentCourseRepository
+				.countByCourseIdAndGradeIsNull(courseId);
+
+		if (ungradedCount > 0) {
+			throw new IllegalStateException(
+					"存在 " + ungradedCount + " 名学生未评分"
+			);
+		}
+	}
+
 	@Override
 	@Transactional
-	public void closeCourse(String courseId) throws Exception {
+	public void closeCourse(String courseId) {
+		// 原有关闭课程逻辑
 		Course course = courseRepository.findById(courseId)
-				.orElseThrow(() -> new Exception("课程不存在"));
-		if (course.getStatus() == 1) {
-			throw new Exception("课程已结课");
-		}
+				.orElseThrow(() -> new IllegalArgumentException("课程不存在"));
 		course.setStatus(1);
 		courseRepository.save(course);
 	}

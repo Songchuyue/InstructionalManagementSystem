@@ -1,5 +1,6 @@
 package cn.edu.jlu.controller;
 
+import cn.edu.jlu.dto.AdminCourseDTO;
 import cn.edu.jlu.dto.AdminDTO;
 import cn.edu.jlu.entity.Admin;
 import cn.edu.jlu.entity.Course;
@@ -56,22 +57,18 @@ public class AdminController {
 
 	@PostMapping("/logout")
 	public String logout(HttpSession session) {
-		session.removeAttribute("admin"); // 清除会话
+		session.removeAttribute("admin");
 		return "redirect:/admin/login";
 	}
 
 	@GetMapping("/courses")
 	public String showAllCourses(HttpSession session, Model model) {
-		// 检查管理员登录状态
 		Admin admin = (Admin) session.getAttribute("admin");
 		if (admin == null) return "redirect:/admin/login";
 
-		// 获取所有课程（包含教师详细信息）
-		List<Course> allCourses = courseService.findAllWithTeacher();
-
-		// 传递到前端（根据需求调整数据）
-		model.addAttribute("courses", allCourses);
-		return "admin/courses"; // 对应模板路径
+		List<AdminCourseDTO> courses = courseService.findAdminCourseData();
+		model.addAttribute("courses", courses);
+		return "admin/courses";
 	}
 
 	@PostMapping("/close-course")
@@ -80,6 +77,8 @@ public class AdminController {
 			RedirectAttributes redirectAttributes
 	) {
 		try {
+			// 添加校验逻辑
+			courseService.validateCourseClosable(courseId);
 			courseService.closeCourse(courseId);
 			redirectAttributes.addFlashAttribute("success", "课程已结课");
 		} catch (Exception e) {

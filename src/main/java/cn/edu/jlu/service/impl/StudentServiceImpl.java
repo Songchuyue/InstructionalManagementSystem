@@ -69,29 +69,33 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	@Transactional
 	public void enrollStudentInCourse(String studentId, String courseId) throws Exception {
-		// 加强参数校验（新增）
+		// 其实和==null和多大区别, 除了检查空字符串, 还判断一下纯空格
 		if (StringUtils.isBlank(studentId) || StringUtils.isBlank(courseId)) {
 			throw new IllegalArgumentException("学生ID和课程ID不能为空");
 		}
 
-		// 获取课程实体（新增异常信息细化）
+		/*
+		 * 虽然前端已经对选课有了限制, 只有课程存在才提供选课按钮, 但是后端须始终认为"前端不可信"
+		 * SELECT * FROM students WHERE student_id = ?
+		 */
+		Student student = studentRepository.findById(studentId)
+				.orElseThrow(() -> new Exception("学生不存在，ID：" + studentId));
+
+		// SELECT * FROM courses WHERE course_id = ?
 		Course course = courseRepository.findById(courseId)
 				.orElseThrow(() -> new Exception("课程不存在，ID：" + courseId));
 
+		//SELECT COUNT(*) > 0 FROM student_courses WHERE student_id = ? AND course_id = ?
 		if (studentCourseRepository.existsByStudent_StudentIdAndCourse_CourseId(studentId, courseId)) {
 			throw new Exception("重复选课：学生[" + studentId + "] 课程[" + courseId + "]");
 		}
 
-		// 获取学生实体（新增异常信息细化）
-		Student student = studentRepository.findById(studentId)
-				.orElseThrow(() -> new Exception("学生不存在，ID：" + studentId));
-
-		// 创建选课记录（关键修改）
+		// 创建选课记录
 		StudentCourse studentCourse = new StudentCourse();
-		studentCourse.setStudentId(studentId);  // 显式设置主键字段
-		studentCourse.setCourseId(courseId);     // 显式设置主键字段
-		studentCourse.setStudent(student);      // 保持关联关系
-		studentCourse.setCourse(course);        // 保持关联关系
+		studentCourse.setStudentId(studentId);
+		studentCourse.setCourseId(courseId);
+		studentCourse.setStudent(student);
+		studentCourse.setCourse(course);
 		studentCourse.setGrade(null);
 
 		studentCourseRepository.save(studentCourse);
