@@ -42,6 +42,7 @@ public class StudentController {
 	// 显示登录页面
 	@GetMapping("/login")
 	public String showLoginForm(Model model) {
+		// 前端通过key(即attributeName:"studentDTO"), 与后端对象绑定
 		model.addAttribute("studentDTO", new StudentDTO());
 		return "student/login";
 	}
@@ -49,17 +50,23 @@ public class StudentController {
 	// 处理登录提交
 	@PostMapping("/login")
 	public String loginSubmit(
-			@ModelAttribute("studentDTO") StudentDTO studentDTO,
+			@Valid @ModelAttribute("studentDTO") StudentDTO studentDTO,
+			BindingResult bindingResult,
 			Model model,
 			HttpSession session
 	) {
-		Student student = studentService.validateLogin(studentDTO);
-		if (student == null) {
-			model.addAttribute("error", "学号或密码错误");
+		if(bindingResult.hasErrors()) {
+//			model.addAttribute("loginError", "学号或密码不能为空");
 			return "student/login";
 		}
-		session.setAttribute("student", student); // 存储会话信息
-		return "redirect:/student/dashboard";     // 跳转到学生主页
+		// controller层不关心如何查询学生实体, 只需要接受结果(Student对象 或 null)
+		Student student = studentService.validateLogin(studentDTO);
+		if (student == null) {
+			model.addAttribute("loginError", "学号或密码错误");
+			return "student/login";
+		}
+		session.setAttribute("student", student);
+		return "redirect:/student/dashboard";
 	}
 
 	// 显示学生主页

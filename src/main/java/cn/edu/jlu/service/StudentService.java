@@ -9,6 +9,7 @@ public interface StudentService {
 	 * @param studentDTO 登录信息（学号、密码）
 	 * @return 成功返回 Student 对象，失败返回 null
 	 */
+	// (Controller)loginSubmit -> (Service)validateLogin
 	Student validateLogin(StudentDTO studentDTO);
 
 	Student updateStudentInfo(Student student);

@@ -27,7 +27,7 @@
         </div>
 
         <!-- 错误提示 -->
-        <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${loginError != null}" class="alert alert-danger" th:text="${loginError}"></div>
 
         <button type="submit" class="btn btn-primary w-100">登录</button>
     </form>
