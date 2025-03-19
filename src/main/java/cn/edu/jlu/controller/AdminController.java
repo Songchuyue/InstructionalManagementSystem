@@ -49,8 +49,8 @@ public class AdminController {
 			model.addAttribute("error", "管理员ID或密码错误");
 			return "admin/login";
 		}
-		session.setAttribute("admin", admin); // 存储管理员对象到会话
-		return "redirect:/admin/dashboard";   // 跳转到管理主页
+		session.setAttribute("admin", admin);
+		return "redirect:/admin/dashboard";
 	}
 
 	@GetMapping("/dashboard")
@@ -58,7 +58,7 @@ public class AdminController {
 		Admin admin = (Admin) session.getAttribute("admin");
 		if (admin == null) return "redirect:/admin/login";
 
-		model.addAttribute("admin", admin); // 传递管理员信息到页面
+		model.addAttribute("admin", admin);
 		return "admin/dashboard";
 	}
 
@@ -113,20 +113,22 @@ public class AdminController {
 			RedirectAttributes redirectAttributes
 	) {
 		try {
-			// 检查教师是否存在
+			if (courseRepository.existsById(courseId)) {
+				throw new IllegalArgumentException("课程ID已存在");
+			}
+
 			if (!teacherRepository.existsById(teacherId)) {
 				throw new IllegalArgumentException("教师ID不存在");
 			}
 
-			// 创建课程对象
 			Course course = new Course();
 			course.setCourseId(courseId);
 			course.setCourseName(courseName);
-			course.setTeacher(new Teacher(teacherId)); // 通过ID关联教师
+			course.setTeacher(new Teacher(teacherId));
 			course.setCredit(credit);
 			course.setSemester(semester);
 			course.setClassroom(classroom);
-			course.setStatus(0); // 默认未结课
+			course.setStatus(0);
 
 			courseRepository.save(course);
 			redirectAttributes.addFlashAttribute("success", "课程添加成功");
