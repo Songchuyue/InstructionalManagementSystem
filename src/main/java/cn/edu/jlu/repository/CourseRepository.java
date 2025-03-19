@@ -61,7 +61,7 @@ public interface CourseRepository extends JpaRepository<Course, String> {
 			"c.courseId, c.courseName, c.status, t.name, t.email, " +
 			"c.credit, c.semester, c.classroom, " +
 			"COUNT(sc.studentId), " +
-			"SUM(CASE WHEN sc.grade IS NULL THEN 1 ELSE 0 END) = 0) " +
+			"CASE WHEN SUM(CASE WHEN sc.studentId IS NOT NULL AND sc.grade IS NULL THEN 1 ELSE 0 END) = 0 THEN true ELSE false END) " +
 			"FROM Course c " +
 			"JOIN c.teacher t " +
 			"LEFT JOIN c.studentCourses sc " +

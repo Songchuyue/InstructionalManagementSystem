@@ -84,7 +84,7 @@ public class StudentController {
 
 	@PostMapping("/logout")
 	public String logout(HttpSession session) {
-		session.removeAttribute("admin"); // 清除会话
+		session.removeAttribute("student"); // 清除会话
 		return "redirect:/student/login";
 	}
 
