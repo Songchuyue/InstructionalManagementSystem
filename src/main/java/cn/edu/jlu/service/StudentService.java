@@ -1,6 +1,7 @@
 package cn.edu.jlu.service;
 
 import cn.edu.jlu.dto.StudentDTO;
+import cn.edu.jlu.dto.StudentUpdateForm;
 import cn.edu.jlu.entity.Student;
 
 public interface StudentService {
@@ -12,7 +13,7 @@ public interface StudentService {
 	// (Controller)loginSubmit -> (Service)validateLogin
 	Student validateLogin(StudentDTO studentDTO);
 
-	Student updateStudentInfo(Student student);
+	Student updateStudentInfo(String studentId, StudentUpdateForm studentUpdateForm);
 
 	void enrollStudentInCourse(String studentId, String courseId) throws Exception;
 

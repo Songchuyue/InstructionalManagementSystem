@@ -15,9 +15,8 @@ public class StudentUpdateForm {
 	private String semester;
 
 	@NotNull(message = "专业不能为空")
-	@Size(min = 2, max = 30, message = "专业名称2-30字符")
+	@Size(min = 2, max = 100, message = "专业名称2-100字符")
 	private String major;
 
-	//@Size(min = 6, max = 20, message = "密码长度6-20位")
 	private String newPassword;
 }

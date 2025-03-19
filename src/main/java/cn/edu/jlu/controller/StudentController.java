@@ -59,12 +59,14 @@ public class StudentController {
 //			model.addAttribute("loginError", "学号或密码不能为空");
 			return "student/login";
 		}
+
 		// controller层不关心如何查询学生实体, 只需要接受结果(Student对象 或 null)
 		Student student = studentService.validateLogin(studentDTO);
 		if (student == null) {
 			model.addAttribute("loginError", "学号或密码错误");
 			return "student/login";
 		}
+
 		session.setAttribute("student", student);
 		return "redirect:/student/dashboard";
 	}
@@ -72,18 +74,25 @@ public class StudentController {
 	// 显示学生主页
 	@GetMapping("/dashboard")
 	public String showDashboard(Model model, HttpSession session) {
+		// 用session存放持久数据(如:登录后的用户信息), 用model存放临时数据(如:错误提示)
 		Student student = (Student) session.getAttribute("student");
 		if (student == null) {
 			return "redirect:/student/login";
 		}
+
+		// student显示个人信息
 		model.addAttribute("student", student);
 
-		// 初始化表单对象（用当前学生数据填充）
+		/* Q: 为什么需要model.containsAttribute("updateForm")判断
+		 * A: 当用户提交表单失败(如校验错误)后, 会重定向到"/dashboard", 因此需要保留已填写的数据, 避免覆盖用户输入
+		 * Q: 为什么要对updateForm赋值?
+		 * A: 用户在填写表单时无需再覆写已经显示在[个人信息]上的属性
+		 */
 		if (!model.containsAttribute("updateForm")) {
 			StudentUpdateForm updateForm = new StudentUpdateForm();
-			updateForm.setAge(student.getAge());      // 初始化年龄
-			updateForm.setSemester(student.getSemester());  // 初始化年级
-			updateForm.setMajor(student.getMajor());  // 初始化专业
+			updateForm.setAge(student.getAge());
+			updateForm.setSemester(student.getSemester());
+			updateForm.setMajor(student.getMajor());
 			model.addAttribute("updateForm", updateForm);
 		}
 		return "student/dashboard";
@@ -97,41 +106,29 @@ public class StudentController {
 
 	@PostMapping("/updateInfo")
 	public String updateInfo(
-			@Valid @ModelAttribute("updateForm") StudentUpdateForm updateForm, // 绑定表单对象
-			BindingResult bindingResult, // 必须紧跟 @Valid 参数
+			@Valid @ModelAttribute("updateForm") StudentUpdateForm studentUpdateForm,
+			BindingResult bindingResult,
 			HttpSession session,
-			Model model
+			RedirectAttributes redirectAttributes
 	) {
 		Student sessionStudent = (Student) session.getAttribute("student");
-		if (sessionStudent == null) {
+		if(sessionStudent == null) {
 			return "redirect:/student/login";
 		}
 
-		// 校验失败处理
-		if (bindingResult.hasErrors()) {
-			model.addAttribute("student", sessionStudent);
-			return "student/dashboard";
+		if(bindingResult.hasErrors()) {
+			return "redirect:/student/dashboard";
 		}
 
-		// 更新字段
-		sessionStudent.setAge(updateForm.getAge());
-		sessionStudent.setSemester(updateForm.getSemester());
-		sessionStudent.setMajor(updateForm.getMajor());
+		String studentId = sessionStudent.getStudentId();
+		Student updatedStudent = studentService.updateStudentInfo(studentId, studentUpdateForm);
 
-		if (updateForm.getNewPassword() != null && !updateForm.getNewPassword().isEmpty()) {
-			sessionStudent.setPassword(updateForm.getNewPassword());
+		if(updatedStudent == null) {
+			redirectAttributes.addFlashAttribute("updateError", "信息修改失败");
+		} else {
+			redirectAttributes.addFlashAttribute("updateSuccess", "信息修改成功");
+			session.setAttribute("student", updatedStudent);
 		}
-
-		// 保存到数据库
-		Student updatedStudent = studentService.updateStudentInfo(sessionStudent);
-		if (updatedStudent == null) {
-			model.addAttribute("updateError", "信息更新失败");
-			return "student/dashboard";
-		}
-
-		// 更新 Session 数据
-		session.setAttribute("student", updatedStudent);
-		model.addAttribute("updateSuccess", "信息修改成功！");
 		return "redirect:/student/dashboard";
 	}
 

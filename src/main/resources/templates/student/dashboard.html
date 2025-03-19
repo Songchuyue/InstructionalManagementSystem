@@ -83,7 +83,7 @@
                     <form th:action="@{/student/logout}" method="post">
                         <button type="submit" class="btn btn-danger w-100 py-2">
                             <i class="bi bi-box-arrow-right"></i>
-                            安全退出
+                            退出登录
                         </button>
                     </form>
                 </div>
@@ -105,7 +105,7 @@
                 <div class="mb-3">
                     <label class="form-label">年龄</label>
                     <input type="number" class="form-control"
-                           th:field="*{age}" required min="16" max="40">
+                           th:field="*{age}" required min="1" max="151"> <!-- 设置1~151, 后端要求1~150, 通过150校验后端验证逻辑 -->
                     <small class="text-danger" th:if="${#fields.hasErrors('age')}"
                            th:errors="*{age}"></small>
                 </div>
@@ -127,7 +127,7 @@
                 <div class="mb-3">
                     <label class="form-label">专业</label>
                     <input type="text" class="form-control"
-                           th:field="*{major}" required maxlength="20">
+                           th:field="*{major}" required minlength="2" maxlength="100">
                     <small class="text-danger" th:if="${#fields.hasErrors('major')}"
                            th:errors="*{major}"></small>
                 </div>

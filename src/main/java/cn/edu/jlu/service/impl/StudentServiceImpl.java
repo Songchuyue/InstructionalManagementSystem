@@ -1,6 +1,7 @@
 package cn.edu.jlu.service.impl;
 
 import cn.edu.jlu.dto.StudentDTO;
+import cn.edu.jlu.dto.StudentUpdateForm;
 import cn.edu.jlu.entity.Course;
 import cn.edu.jlu.entity.Student;
 import cn.edu.jlu.entity.StudentCourse;
@@ -42,22 +43,21 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	@Transactional
-	public Student updateStudentInfo(Student studentFromSession) {
-		if (studentFromSession == null) return null;
+	public Student updateStudentInfo(String studentId, StudentUpdateForm studentUpdateForm) {
+		if (studentUpdateForm == null) return null;
 
 		/* findById返回<Optional>Student, orElse(null)表示若查询到结果则返回Student对象, 否则返回null
 		 * 从数据库加载托管实体(必须通过findById或类似方法从数据库加载), 其修改会自动同步到数据库
 		 */
-		Student managedStudent = studentRepository.findById(studentFromSession.getStudentId()).orElse(null);
+		Student managedStudent = studentRepository.findById(studentId).orElse(null);
 		if (managedStudent == null) return null;
 
-		managedStudent.setAge(studentFromSession.getAge());
-		managedStudent.setSemester(studentFromSession.getSemester());
-		managedStudent.setMajor(studentFromSession.getMajor());
+		managedStudent.setAge(studentUpdateForm.getAge());
+		managedStudent.setSemester(studentUpdateForm.getSemester());
+		managedStudent.setMajor(studentUpdateForm.getMajor());
 
-		if (studentFromSession.getPassword() != null &&
-				!studentFromSession.getPassword().isEmpty()) {
-			managedStudent.setPassword(studentFromSession.getPassword());
+		if (studentUpdateForm.getNewPassword() != null && !studentUpdateForm.getNewPassword().isEmpty()) {
+			managedStudent.setPassword(studentUpdateForm.getNewPassword());
 		}
 
 		managedStudent.setUpdateTime(LocalDateTime.now());
