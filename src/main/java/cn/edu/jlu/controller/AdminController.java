@@ -4,6 +4,9 @@ import cn.edu.jlu.dto.AdminCourseDTO;
 import cn.edu.jlu.dto.AdminDTO;
 import cn.edu.jlu.entity.Admin;
 import cn.edu.jlu.entity.Course;
+import cn.edu.jlu.entity.Teacher;
+import cn.edu.jlu.repository.CourseRepository;
+import cn.edu.jlu.repository.TeacherRepository;
 import cn.edu.jlu.service.AdminService;
 import cn.edu.jlu.service.CourseService;
 import jakarta.servlet.http.HttpSession;
@@ -19,10 +22,14 @@ import java.util.List;
 public class AdminController {
 	private final AdminService adminService;
 	private final CourseService courseService;
+	private final CourseRepository courseRepository;
+	private final TeacherRepository teacherRepository;
 
-	public AdminController(AdminService adminService, CourseService courseService) {
+	public AdminController(AdminService adminService, CourseService courseService, CourseRepository courseRepository, TeacherRepository teacherRepository) {
 		this.adminService = adminService;
 		this.courseService = courseService;
+		this.courseRepository = courseRepository;
+		this.teacherRepository = teacherRepository;
 	}
 
 	@GetMapping("/login")
@@ -83,6 +90,48 @@ public class AdminController {
 			redirectAttributes.addFlashAttribute("success", "课程已结课");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("error", "操作失败: " + e.getMessage());
+		}
+		return "redirect:/admin/courses";
+	}
+
+	@GetMapping("/courses/add")
+	public String showAddCourseForm(HttpSession session) {
+		Admin admin = (Admin) session.getAttribute("admin");
+		if (admin == null) return "redirect:/admin/login";
+		return "admin/add-course";
+	}
+
+	// 处理添加课程提交
+	@PostMapping("/courses/add")
+	public String addCourse(
+			@RequestParam String courseId,
+			@RequestParam String courseName,
+			@RequestParam String teacherId,
+			@RequestParam Integer credit,
+			@RequestParam String semester,
+			@RequestParam String classroom,
+			RedirectAttributes redirectAttributes
+	) {
+		try {
+			// 检查教师是否存在
+			if (!teacherRepository.existsById(teacherId)) {
+				throw new IllegalArgumentException("教师ID不存在");
+			}
+
+			// 创建课程对象
+			Course course = new Course();
+			course.setCourseId(courseId);
+			course.setCourseName(courseName);
+			course.setTeacher(new Teacher(teacherId)); // 通过ID关联教师
+			course.setCredit(credit);
+			course.setSemester(semester);
+			course.setClassroom(classroom);
+			course.setStatus(0); // 默认未结课
+
+			courseRepository.save(course);
+			redirectAttributes.addFlashAttribute("success", "课程添加成功");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("error", "添加失败: " + e.getMessage());
 		}
 		return "redirect:/admin/courses";
 	}

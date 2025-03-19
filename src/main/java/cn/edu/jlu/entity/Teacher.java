@@ -3,6 +3,7 @@ package cn.edu.jlu.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "teachers")
 @Data
+@NoArgsConstructor
 public class Teacher {
 	@Id
 	@Column(name = "teacher_id", length = 20)
@@ -39,4 +41,8 @@ public class Teacher {
 	@LastModifiedDate
 	@Column(name = "update_time")
 	private LocalDateTime updateTime;
+
+	public Teacher(String teacherId) {
+		this.teacherId = teacherId;
+	}
 }
